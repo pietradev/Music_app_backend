@@ -47,3 +47,12 @@ class ArtistTrackMap(models.Model):
     
     def __str__(self):
         return f"{self.artist.name} - {self.track.title}"
+    
+
+class Lyric(models.Model):
+    track = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='lyrics')
+    artist_name = models.CharField(max_length=255)
+    lyrics = models.TextField()
+
+    class Meta:
+        unique_together = ('track', 'artist_name')

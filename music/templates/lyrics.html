@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lyrics for {{ track.title }}</title>
+</head>
+<body>
+    <h1>Lyrics for: {{ track.title }}</h1>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% elif lyrics %}
+        <pre>{{ lyrics }}</pre>
+    {% else %}
+        <p>No lyrics found.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'playlist-search-html' %}">← Back to Search</a>
+</body>
+</html>

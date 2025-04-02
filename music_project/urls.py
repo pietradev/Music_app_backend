@@ -20,5 +20,5 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('music.urls')),  # ← isso conecta as URLs do seu app
+     path('', include('music.urls')),   # ← isso conecta as URLs do seu app
 ]

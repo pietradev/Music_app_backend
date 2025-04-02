@@ -1,14 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from music.services.spotify_api import get_token, search_playlists, get_playlist_tracks
+from music.services.genius_api import fetch_and_store_lyrics
 from music.repositories.spotify_repository import (
     save_playlist, save_track, save_artist,
     save_playlist_track_map, save_artist_track_map
 )
-from .models import Playlist, PlaylistTrackMap
+from .models import Playlist, PlaylistTrackMap, Track, Lyric, ArtistTrackMap
 from .serializers import TrackSerializer
+
 from dotenv import load_dotenv
 import os
 
@@ -74,3 +76,64 @@ class PlaylistSearchView(APIView):
         # Serializa as faixas com seus artistas
         serializer = TrackSerializer(tracks, many=True)
         return Response(serializer.data)
+    
+
+
+def search_playlist_html(request):
+    playlist_name = request.GET.get("playlistName")
+    context = {}
+
+    if playlist_name:
+        try:
+            playlist = Playlist.objects.get(name__icontains=playlist_name)
+        except Playlist.DoesNotExist:
+            token = get_token()
+            playlists = search_playlists(token, playlist_name)
+            if playlists:
+                playlist_data = playlists[0]
+                playlist = save_playlist(playlist_data)
+                tracks = get_playlist_tracks(token, playlist_data["id"])
+
+                for track_data in tracks:
+                    track = save_track(track_data)
+                    save_playlist_track_map(playlist, track)
+                    for artist_data in track_data.get("artists", []):
+                        artist = save_artist(artist_data)
+                        save_artist_track_map(artist, track)
+
+        # Buscar as faixas no banco
+        track_links = PlaylistTrackMap.objects.filter(playlist=playlist).select_related("track")
+        tracks = [link.track for link in track_links]
+        context["tracks"] = tracks
+    else:
+        context["message"] = "Type in the name of your playlist."
+
+    return render(request, "index.html", context)
+
+
+
+def show_lyrics(request, track_id):
+    track = get_object_or_404(Track, id=track_id)
+    lyrics_obj = track.lyrics.first()
+
+    if not lyrics_obj:
+        artist_map = track.artisttrackmap_set.first()
+        artist_name = artist_map.artist.name if artist_map else None
+
+        if not artist_name:
+            return render(request, "lyrics.html", {
+                "track": track,
+                "error": "No artist found for this track."
+            })
+
+        lyrics_obj, error = fetch_and_store_lyrics(track_id, artist_name)
+        if error:
+            return render(request, "lyrics.html", {
+                "track": track,
+                "error": error
+            })
+
+    return render(request, "lyrics.html", {
+        "track": track,
+        "lyrics": lyrics_obj.lyrics
+    })
