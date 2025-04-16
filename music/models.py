@@ -56,3 +56,24 @@ class Lyric(models.Model):
 
     class Meta:
         unique_together = ('track', 'artist_name')
+
+
+class SoundCloudWidget(models.Model):
+    track_id = models.BigIntegerField(unique=True)
+    title = models.CharField(max_length=255)
+    artist = models.CharField(max_length=255)
+    stream_url = models.TextField()
+    artwork_url = models.TextField(blank=True, null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} by {self.artist}"
+
+
+class Recommendation(models.Model):
+    track = models.ForeignKey(SoundCloudWidget, on_delete=models.CASCADE, related_name='recommended_by')
+    recommended_track = models.ForeignKey(SoundCloudWidget, on_delete=models.CASCADE, related_name='recommendations')
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Recommend {self.recommended_track.title} for {self.track.title}"
