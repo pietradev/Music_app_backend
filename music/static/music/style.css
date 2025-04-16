@@ -1,0 +1,19 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+
+  .playlist-box{
+    width: 400px;
+    padding: 5px 4px;
+    margin: 10px 3px;
+  }
+
+  .center-box {
+    max-width: 600px;
+    margin: 60px auto;
+    text-align: center;
+    padding: 20px;
+  }
