@@ -145,7 +145,7 @@ def soundcloud_music_view(request):
     artist = request.GET.get('artist')
     search_term = f"{title} {artist}"
     
-    sc_tracks = search_soundcloud_tracks(search_term, limit=5)
+    sc_tracks = search_soundcloud_tracks(search_term, limit=3)
 
     result_tracks = []
 
