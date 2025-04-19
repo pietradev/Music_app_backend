@@ -2,13 +2,15 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q 
 from music.services.spotify_api import get_token, search_playlists, get_playlist_tracks
 from music.services.genius_api import fetch_and_store_lyrics
+from music.services.soundcloud_api import *
 from music.repositories.spotify_repository import (
     save_playlist, save_track, save_artist,
     save_playlist_track_map, save_artist_track_map
 )
-from .models import Playlist, PlaylistTrackMap, Track, Lyric, ArtistTrackMap
+from .models import Playlist, PlaylistTrackMap, Track, Lyric, ArtistTrackMap, SoundCloudWidget
 from .serializers import TrackSerializer
 
 from dotenv import load_dotenv
@@ -137,3 +139,42 @@ def show_lyrics(request, track_id):
         "track": track,
         "lyrics": lyrics_obj.lyrics
     })
+
+def soundcloud_music_view(request):
+    title = request.GET.get('title')
+    artist = request.GET.get('artist')
+    search_term = f"{title} {artist}"
+    
+    sc_tracks = search_soundcloud_tracks(search_term, limit=5)
+
+    result_tracks = []
+
+    for track in sc_tracks:
+        if track.get("streamable"):
+            track_id = track["id"]
+            title = track["title"]
+            artist = track["user"]["username"]
+            artwork_url = track.get("artwork_url", "")
+            stream_url = build_stream_url(track_id)
+            iframe_url = build_iframe_url(track_id)
+
+            # Optional: store in your Track model if desired
+            SoundCloudWidget.objects.get_or_create(
+                title=title,
+                artist=artist,
+                defaults={
+                    "track_id": track_id,
+                    "stream_url": stream_url,
+                    "artwork_url": artwork_url,
+                }
+            )
+
+            result_tracks.append({
+                "title": title,
+                "artist": artist,
+                "artwork_url": artwork_url,
+                "iframe_url": iframe_url,
+                "track_id": track_id,
+            })
+
+    return render(request, "music.html", {"tracks": result_tracks})
