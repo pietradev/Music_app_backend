@@ -77,3 +77,13 @@ class Recommendation(models.Model):
 
     def __str__(self):
         return f"Recommend {self.recommended_track.title} for {self.track.title}"
+
+class Metadata(models.Model):
+    track = models.OneToOneField('Track', on_delete=models.CASCADE, related_name='discogs_release')
+    title = models.CharField(max_length=255)
+    year = models.CharField(max_length=10, blank=True, null=True)
+    label = models.CharField(max_length=255, blank=True, null=True)
+    discogs_url = models.URLField()
+
+    def __str__(self):
+        return f"Discogs: {self.title} ({self.year})"
