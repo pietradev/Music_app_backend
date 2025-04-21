@@ -12,7 +12,7 @@ CLIENT_ID = os.getenv("SOUNDCLOUD_CLIENT_ID")
 BASE_URL = "https://api-v2.soundcloud.com"
 STREAM_BASE_URL = "https://api.soundcloud.com"
 
-def search_soundcloud_tracks(query, limit=5):
+def search_soundcloud_tracks(query, limit=3):
     url = f"{BASE_URL}/search/tracks"
     params = {
         "q": query,
