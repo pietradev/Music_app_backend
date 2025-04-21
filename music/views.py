@@ -5,12 +5,14 @@ from rest_framework import status
 from django.db.models import Q 
 from music.services.spotify_api import get_token, search_playlists, get_playlist_tracks
 from music.services.genius_api import fetch_and_store_lyrics
+from music.services.discogs_api import get_track_data
+from music.repositories.discogs_repository import fetch_release_info_for_track
 from music.services.soundcloud_api import *
 from music.repositories.spotify_repository import (
     save_playlist, save_track, save_artist,
     save_playlist_track_map, save_artist_track_map
 )
-from .models import Playlist, PlaylistTrackMap, Track, Lyric, ArtistTrackMap, SoundCloudWidget
+from .models import Playlist, PlaylistTrackMap, Track, Lyric, ArtistTrackMap, SoundCloudWidget, Metadata
 from .serializers import TrackSerializer
 
 from dotenv import load_dotenv
@@ -178,3 +180,15 @@ def soundcloud_music_view(request):
             })
 
     return render(request, "music.html", {"tracks": result_tracks})
+
+def release_info(request, track_id):
+    track = get_object_or_404(Track, id=track_id)
+    release, error = fetch_release_info_for_track(track)
+
+    context = {
+        "track": track,
+        "release": release,
+        "error": error
+    }
+
+    return render(request, "track-info.html", context)
