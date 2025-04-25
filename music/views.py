@@ -92,9 +92,24 @@ def search_playlist_html(request):
             playlist = Playlist.objects.get(name__icontains=playlist_name)
         except Playlist.DoesNotExist:
             token = get_token()
+
+            if not token:
+                context["message"] = "Error retrieving Spotify token."
+                return render(request, "index.html", context)
+        
             playlists = search_playlists(token, playlist_name)
+
+            if not playlists:
+                context["message"] = f"No playlists found for '{playlist_name}'."
+                return render(request, "index.html", context)
+            
             if playlists:
                 playlist_data = playlists[0]
+
+                if not playlist_data:
+                    context["message"] = f"Invalid playlist data received from Spotify for '{playlist_name}'."
+                    return render(request, "index.html", context)
+            
                 playlist = save_playlist(playlist_data)
                 tracks = get_playlist_tracks(token, playlist_data["id"])
 
@@ -136,10 +151,18 @@ def show_lyrics(request, track_id):
                 "track": track,
                 "error": error
             })
+        
+    lyrics = lyrics_obj.lyrics # Ensure you are getting the string
+
+    # Apply split or slicing if necessary
+    if lyrics:
+        intro_start_index = lyrics.find("[")
+        if intro_start_index != -1:
+            lyrics = lyrics[intro_start_index:]
 
     return render(request, "lyrics.html", {
         "track": track,
-        "lyrics": lyrics_obj.lyrics
+        "lyrics": lyrics
     })
 
 def soundcloud_music_view(request):

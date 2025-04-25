@@ -12,7 +12,11 @@ CLIENT_ID = os.getenv("SOUNDCLOUD_CLIENT_ID")
 BASE_URL = "https://api-v2.soundcloud.com"
 STREAM_BASE_URL = "https://api.soundcloud.com"
 
-def search_soundcloud_tracks(query, limit=3):
+def search_soundcloud_tracks(query, limit=5):
+    if not query:
+        print("Missing search query")
+        return []
+
     url = f"{BASE_URL}/search/tracks"
     params = {
         "q": query,
@@ -20,13 +24,21 @@ def search_soundcloud_tracks(query, limit=3):
         "limit": limit
     }
 
+    headers = {
+        "User-Agent": "Mozilla/5.0",  # Mimic browser request
+        "Accept": "application/json"
+    }
+
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
-        return response.json().get("collection", [])
+        data = response.json()
+        return data.get("collection", [])
     except requests.RequestException as e:
         print(f"SoundCloud API Error: {e}")
+        print(f"Status code: {getattr(e.response, 'status_code', 'N/A')}")
         return []
+
 
 def build_stream_url(track_id):
     return f"{STREAM_BASE_URL}/tracks/{track_id}/stream?client_id={CLIENT_ID}"
