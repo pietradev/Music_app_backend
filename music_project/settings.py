@@ -94,15 +94,12 @@ USE_AWS_DB = os.getenv("USE_AWS_DB", "False") == "True"
 if USE_AWS_DB:
     DATABASES = {
         'default': {
-            'ENGINE': os.getenv("DB_ENGINE"),
-            'NAME': os.getenv("DB_NAME"),
-            'USER': os.getenv("DB_USER"),
-            'PASSWORD': os.getenv("DB_PASSWORD"),
-            'HOST': os.getenv("DB_HOST"),
-            'PORT': os.getenv("DB_PORT", "3306"),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'music_db',
+            'USER': 'rowan',
+            'PASSWORD': 'rowan123',
+            'HOST': 'rowan-projects-classes.c8boum2y64fr.us-east-1.rds.amazonaws.com',
+            'PORT': '3306',
         }
     }
 else:

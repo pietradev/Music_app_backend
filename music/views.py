@@ -92,7 +92,6 @@ def search_playlist_html(request):
             playlist = Playlist.objects.get(name__icontains=playlist_name)
         except Playlist.DoesNotExist:
             token = get_token()
-
             if not token:
                 context["message"] = "Error retrieving Spotify token."
                 return render(request, "index.html", context)
