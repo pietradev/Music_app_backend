@@ -1,0 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+  }
+
+  body {
+    background: linear-gradient(to right, #6a11cb, #2575fc); /* example: purple to blue */
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+
+  .playlist-box{
+    width: 400px;
+    padding: 5px 4px;
+    margin: 10px 3px;
+  }
+
+ 

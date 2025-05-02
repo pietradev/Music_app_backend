@@ -123,6 +123,7 @@ def search_playlist_html(request):
         track_links = PlaylistTrackMap.objects.filter(playlist=playlist).select_related("track")
         tracks = [link.track for link in track_links]
         context["tracks"] = tracks
+        context["playlist_name"] = playlist_name
     else:
         context["message"] = "Type in the name of your playlist."
 
@@ -133,6 +134,7 @@ def search_playlist_html(request):
 def show_lyrics(request, track_id):
     track = get_object_or_404(Track, id=track_id)
     lyrics_obj = track.lyrics.first()
+    playlist_name = request.GET.get("playlistName")
 
     if not lyrics_obj:
         artist_map = track.artisttrackmap_set.first()
@@ -161,13 +163,16 @@ def show_lyrics(request, track_id):
 
     return render(request, "lyrics.html", {
         "track": track,
-        "lyrics": lyrics
+        "lyrics": lyrics,
+        "playlist_name": playlist_name
     })
 
 def soundcloud_music_view(request):
     title = request.GET.get('title')
     artist = request.GET.get('artist')
     search_term = f"{title} {artist}"
+
+    track_table = get_object_or_404(Track, title = title)
     
     sc_tracks = search_soundcloud_tracks(search_term, limit=3)
 
@@ -200,8 +205,9 @@ def soundcloud_music_view(request):
                 "iframe_url": iframe_url,
                 "track_id": track_id,
             })
+            
 
-    return render(request, "music.html", {"tracks": result_tracks})
+    return render(request, "music.html", {"tracks": result_tracks, "track_id": track_table})
 
 def release_info(request, track_id):
     track = get_object_or_404(Track, id=track_id)

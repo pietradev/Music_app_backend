@@ -2,7 +2,16 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
   }
+
+  body {
+    background: linear-gradient(to right, #d7d2cc, #304352);
+    min-height: 100vh;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
 
 
   .playlist-box{
@@ -11,9 +20,43 @@
     margin: 10px 3px;
   }
 
-  .center-box {
-    max-width: 600px;
-    margin: 60px auto;
-    text-align: center;
-    padding: 20px;
-  }
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.btn-custom {
+    background-color: #304352;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-custom:hover {
+    background-color: #3e5264;
+    color: #ffffff;
+}
+
+.btn-secondary-custom {
+    background-color: transparent;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+.btn-secondary-custom:hover {
+    background-color: #ffffff;
+    color: #304352;
+}
+
+.column-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-column {
+  width: 100%;
+  max-width: 600px; /* Adjust as needed */
+}
